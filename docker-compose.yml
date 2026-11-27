@@ -1,0 +1,28 @@
+services:
+  console:
+    build: .
+    platform: linux/arm64
+    environment:
+      APP: console
+      PORT: "8080"
+      EDGE_URL: http://edge:8090
+      DOCK_SHARED_SECRET: ${DOCK_SHARED_SECRET:-dev-secret-change-me}
+    ports: ["8080:8080"]
+    depends_on: [edge]
+
+  edge:
+    build: .
+    platform: linux/arm64
+    environment:
+      APP: edge
+      PORT: "8090"
+      DOCK_SHARED_SECRET: ${DOCK_SHARED_SECRET:-dev-secret-change-me}
+    ports: ["8090:8090"]
+
+  mcp:
+    build: .
+    platform: linux/arm64
+    environment:
+      CONSOLE_URL: http://console:8080
+    command: ["python", "-m", "mcp_server.server"]
+    depends_on: [console]
